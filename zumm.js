@@ -62,7 +62,7 @@
 			
 		}();
 		function startVideo(fade){
-			/*var constraints = { audio: false, video: { width: 1280, height: 720 } };
+			var constraints = { audio: false, video: { width: 1280, height: 720 } };
 			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(mediaStream) {
 			  video.srcObject = mediaStream;
@@ -75,7 +75,7 @@
 				$.tween("video", tween_time, {autoAlpha:1, ease:ease});
 			}else{
 				 //video.play();
-			}*/
+			}
 			
 
 			/*var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
