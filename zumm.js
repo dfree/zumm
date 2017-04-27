@@ -340,7 +340,7 @@
 
 			var radius = 0.003;
       		for (var i = 0; i < markers.length; i++){
-      			console.log(pos.lat());
+      			console.log(pos.lat()+" "+ pos.lng());
       			random_pos = new google.maps.LatLng(
       				pos.lat()-radius/2+Math.random()*radius,
       				pos.lng()-radius/2+Math.random()*radius
@@ -423,7 +423,7 @@
 
 	        var options = {
 	          map: map,
-	          position: new google.maps.LatLng(60, 105),
+	          position: new google.maps.LatLng(47.684717 17.623706200000015),
 	          content: content
 	        };
 
