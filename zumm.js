@@ -58,10 +58,11 @@
 			main = $.id("main");
 			main.style.display = "block";
 			
+
 			
 		}();
-		function startVideo(fade = true){
-			var constraints = { audio: false, video: { width: 1280, height: 720 } };
+		function startVideo(fade){
+			/*var constraints = { audio: false, video: { width: 1280, height: 720 } };
 			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(mediaStream) {
 			  video.srcObject = mediaStream;
@@ -74,8 +75,35 @@
 				$.tween("video", tween_time, {autoAlpha:1, ease:ease});
 			}else{
 				 //video.play();
-			}
+			}*/
 			
+
+			/*var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+			var cameraStream;
+
+			getUserMedia.call(navigator, {
+			    audio: false, video: { width: 1280, height: 720 }
+			}, function (stream) {
+			    
+			    Here's where you handle the stream differently. Chrome needs to convert the stream
+			    to an object URL, but Firefox's stream already is one.
+			    
+			    if (window.webkitURL) {
+			        video.src = window.webkitURL.createObjectURL(stream);
+			    } else {
+			        video.src = stream;
+			    }
+
+			    //save it for later
+			    //cameraStream = stream;
+
+			    video.play();
+			});
+			if(fade){
+				$.tween("video", tween_time, {autoAlpha:1, ease:ease});
+			}else{
+				 //video.play();
+			}*/
 		}
 		function stopVideo(){
 			$.tween("video", tween_time, {autoAlpha:0, ease:ease, onComplete:function(){/*video.stop();*/}});	
@@ -207,7 +235,7 @@
 				case "game":
 					need_overlay = true;
 					need_white = false;
-					startVideo();
+					startVideo(true);
 				break;
 				case "map":
 					need_overlay = true;
