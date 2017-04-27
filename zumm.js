@@ -423,7 +423,7 @@
 
 	        var options = {
 	          map: map,
-	          position: new google.maps.LatLng(47.684717 17.623706200000015),
+	          position: new google.maps.LatLng(47.684717, 17.623706200000015),
 	          content: content
 	        };
 
