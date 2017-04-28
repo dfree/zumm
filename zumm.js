@@ -4,7 +4,7 @@
 		var map_width_offset = 0;//200;
 		var body;
 		var html;
-		var infowindow;
+		var bee_pos;
 		var map_centered = true;
 		var loading_pos = {x:280/2, y:226/2};
 		var circle_small;
@@ -12,7 +12,7 @@
 		var pos;
 		var act_frame = "loading";
 		var prev_frame = "loading";
-		var frames = ["enter", "reg", "regcomp1", "regcomp2", "camp1", "camp2", "camp3", "game", "hive"];
+		var frames = ["enter", "reg", "regcomp1", "regcomp2", "camp1", "camp2", "camp3", "mapper", "game", "hive"];
 		var slide_base_scale = {width:752, height:1336};
 		var cover_alpha_targ = 0.6;
 		var tween_time = 0.6;
@@ -22,6 +22,9 @@
 		var overlay = false;
 		var white = true;
 		var panorama;
+		var panorama_changed = false;
+		var game_view = "game";//map
+
 		var overlay_positions = {
 			goto_menu:{
 				x:30,
@@ -38,7 +41,12 @@
 				y:200,
 				pos:"bottom_right"
 			},
-			goto_map:{
+			lets_mapper:{
+				x:30,
+				y:200,
+				pos:"bottom_left"
+			},
+			lets_game:{
 				x:30,
 				y:200,
 				pos:"bottom_left"
@@ -58,11 +66,25 @@
 			initializeMap();
 			main = $.id("main");
 			main.style.display = "block";
-			
-
-			
+			body.addEventListener("mousedown", function(event) {
+				if(event.target.classList.contains("widget-scene-canvas")){
+					console.log("hit_map");
+					panorama_changed = false;
+				}else{
+					panorama_changed = true;
+				}
+				
+			   	console.log(event.target);
+			});
+			body.addEventListener("mouseup", function(event) {
+			   console.log("up "+event.target);
+			   if(!panorama_changed){
+			   		console.log("mooooove");
+			   		startRide();
+			   }
+			});
 		}();
-		function startVideo(fade){
+		function startPanorama(fade){
 			if(map && !panorama){
 				map.getStreetView();
 				panorama = map.getStreetView();
@@ -70,10 +92,10 @@
 		          // custom panorama provider function.
 		          var panoOptions = {
 		            position: pos,
-		            //disableDefaultUI: true,
-		            visible: true,
+		            disableDefaultUI: true,
 		            motionTracking: true,
-      				motionTrackingControl: true
+      				//motionTrackingControl: true,
+      				enableCloseButton: false
 		            /*,
 		            panoProvider: getCustomPanorama*/
 		          };
@@ -82,67 +104,31 @@
 		          var radius = 50;
 		          streetviewService.getPanoramaByLocation(pos, radius,
 	              function(result, status) {
-	                console.log("1", arguments);
 	            if (status == google.maps.StreetViewStatus.OK) {
-	              // We'll monitor the links_changed event to check if the current
-	              // pano is either a custom pano or our entry pano.
+
 	              google.maps.event.addListener(panorama, 'links_changed', function() {
-	                  console.log("2", arguments);
+	                  console.log("links_changed", arguments);
 	                  //createCustomLinks(result.location.pano);
 	              });
 	              google.maps.event.addListener(panorama, 'position_changed', function() {
 	                console.log('panorama.getPosition()', panorama.getPosition());
+	                setBeePosition(panorama.getPosition());
+
 	              });
 	              google.maps.event.addListener(panorama, 'pov_changed', function() {
+	              	panorama_changed = true;
 	              });
 	            }
 	          });
 			}
-			/*var constraints = { audio: false, video: { width: 1280, height: 720 } };
-			navigator.mediaDevices.getUserMedia(constraints)
-			.then(function(mediaStream) {
-			  video.srcObject = mediaStream;
-			  video.onloadedmetadata = function(e) {
-			  	video.play();
-			  };
-			})
-			.catch(function(err) { console.log(err.name + ": " + err.message); }); //
-			if(fade){
-				$.tween("video", tween_time, {autoAlpha:1, ease:ease});
-			}else{
-				 //video.play();
-			}*/
+			if(map && panorama){
+				panorama.setVisible(true);
+			}
 			
-
-			/*var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-			var cameraStream;
-
-			getUserMedia.call(navigator, {
-			    audio: false, video: { width: 1280, height: 720 }
-			}, function (stream) {
-			    
-			    Here's where you handle the stream differently. Chrome needs to convert the stream
-			    to an object URL, but Firefox's stream already is one.
-			    
-			    if (window.webkitURL) {
-			        video.src = window.webkitURL.createObjectURL(stream);
-			    } else {
-			        video.src = stream;
-			    }
-
-			    //save it for later
-			    //cameraStream = stream;
-
-			    video.play();
-			});
-			if(fade){
-				$.tween("video", tween_time, {autoAlpha:1, ease:ease});
-			}else{
-				 //video.play();
-			}*/
 		}
-		function stopVideo(){
-			$.tween("video", tween_time, {autoAlpha:0, ease:ease, onComplete:function(){/*video.stop();*/}});	
+		function stopPanorama(){
+			panorama.setVisible(false);
+			//$.tween("video", tween_time, {autoAlpha:0, ease:ease, onComplete:function(){/*video.stop();*/}});	
 		}
 		function reset() {
 			$.set("map", {webkitFilter:"blur(5px)"});
@@ -161,8 +147,9 @@
 			$.set("goto_camp2", {x:524, y:1164, width:166, height:166});
 			$.set("goto_camp3", {x:524, y:1164, width:166, height:166});
 			$.set("go_game", {x:524, y:1164, width:166, height:166});
-			$.set("get_game", {x:524, y:1164, width:166, height:166});
-			startVideo(false);
+			$.set("get_game", {x:368, y:1092, width:166, height:166});
+
+			startPanorama(false);
 
 			for(var i = 0; i < frames.length; i++)
 			{
@@ -174,7 +161,7 @@
 			{
 				buttons[i].addEventListener("click", buttonClicked);
 			}
-			startApp();
+			//startApp();
 
 		};
 		function resize() {
@@ -232,8 +219,8 @@
 				}
 				$.set(butt, {x:_x, y:_y, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
 			}
-			if(infowindow){
-				centerMap();
+			if(bee_pos){
+				centerMap(bee_pos);
 			}
 		};
 		function startApp(){
@@ -242,8 +229,35 @@
 			//startMarkers();
 		}
 		function buttonClicked(e){
+			/*switch(e.target.id){
+				case "gameswitcher":
+					if(game_view == "game"){
+						newFrame("map");
+					}else{
+						newFrame("game");
+					}
+				break;
+				default:
+					var name_arr = e.target.id.split("_");
+					newFrame(name_arr[1]);
+				break;
+			}*/
 			var name_arr = e.target.id.split("_");
 			newFrame(name_arr[1]);
+		}
+		function switchView(frame){
+			if(frame == "mapper"){
+				$.set("lets_game", {autoAlpha:1});
+				$.set("lets_mapper", {autoAlpha:0});
+				markers[1].marker.setMap(map);
+			}else{
+				$.set("lets_mapper", {autoAlpha:1});
+				$.set("lets_game", {autoAlpha:0});
+				if(markers[1].marker){
+					markers[1].marker.setMap(null);
+				}
+				
+			}
 		}
 		function newFrame(act){
 			console.log("newFrame("+act+")");
@@ -257,42 +271,46 @@
 					$.tween("loading", tween_time/2, {autoAlpha:0, ease:ease});
 				break;
 				case "game":
-					stopVideo();
-				break;
-				case "map":
-					removeMarkers();
+					stopBeeAnim();
 				break;
 				default:
 					need_white = true;
+
 				break;
 			}
+
 			$.tween(prev_frame, tween_time, {autoAlpha:0, ease:ease});
 			switch(act_frame){
 				case "game":
-					showMarkers();
+					$.delay(0.4, showMarkers);
 					need_overlay = true;
 					need_white = false;
-					startVideo(true);
+					startPanorama(true);
+					switchView(act_frame);
+					startBeeAnim();
 				break;
-				case "map":
+				case "mapper":
 					need_overlay = true;
 					need_white = false;
 					showMarkers();
-
+					stopPanorama();
+					switchView(act_frame);
 				break;
 				default:
 					need_white = true;
 				break;
 			}
 			//$.tween("loading", 0.5, {autoAlpha:0});
+			
 			$.tween(act_frame, tween_time, {delay:tween_time*0.7, autoAlpha:1, ease:ease});
+			
 			if(overlay && !need_overlay){
 				overlay = false;
 				$.tween("overlay", tween_time, {autoAlpha:0, ease:ease});
 			}
 			if(!overlay && need_overlay){
 				overlay = true;
-				$.tween("overlay", tween_time, {delay:tween_time*0.7, autoAlpha:1, ease:ease});
+				$.tween("overlay", tween_time, {autoAlpha:1, ease:ease});
 			}
 			if(white && !need_white){
 				white = false;
@@ -301,9 +319,77 @@
 			}
 			if(!white && need_white){
 				white = true;
-				$.tween("cover", tween_time, {delay:tween_time*0.7, autoAlpha:cover_alpha_targ, ease:ease});
+				$.tween("cover", tween_time, {autoAlpha:cover_alpha_targ, ease:ease});
 				$.set("map", {webkitFilter:"blur(5px)"});
 			}
+		}
+
+		/*
+
+		//Bee
+
+		*/
+		function setBeePosition(_pos){
+			bee_pos = _pos;
+            map.setCenter(bee_pos);
+            if(markers[1].marker){
+            	markers[1].marker.setPosition(bee_pos);
+            	circle_small.setCenter(bee_pos);
+            	circle_large.setCenter(bee_pos);
+            }
+            //bee_marker = bee_pos;
+            checkPickables();
+            showMarkers();
+		}
+		var bee_state = "dive";
+		var bee_x = 37;
+		var bee_y = 182;
+
+		function startBeeAnim(){
+			$.set("bee_container", {x:bee_x, y:bee_y});
+			bee_state = "rise";
+			beeFly();
+		}
+		function stopBeeAnim(){
+			$.kill("bee_contaier");
+		}
+		function beeRide(){
+			bee_state = "ride";
+			beeFly();
+		}
+		function beeFly(){
+			var _x = bee_x;
+			var _y = bee_y;
+			var _c_rota = 0;
+			var _delay = 0;
+			var ride_plus = {x:250, y:200, rotation:22};
+			var _scal = 1;
+			var _time = 1+Math.random()*0.6;
+			if(bee_state == "dive"){
+				bee_state = "rise"
+			}else if(bee_state == "rise"){
+				_x = bee_x-5-5*Math.random();
+				_y = bee_y+40+40*Math.random();
+				_c_rota = 4;
+				bee_state = "dive"
+			}else if(bee_state == "ride"){
+				_x = bee_x-5-5*Math.random()+ride_plus.x;
+				_y = bee_y+40+40*Math.random()+ride_plus.y;
+				_c_rota = ride_plus.rotation;
+				_delay = 0.3;
+				bee_state = "rise";
+				_scal = 0.5;
+				$.tween("bee_container", _delay, {x:_x, y:_y, scaleX:_scal, scaleY:_scal, rotation:_c_rota, ease:Power1.easeOut});
+				// reset values
+				_x = bee_x;
+				_y = bee_y;
+				_c_rota = 0;
+				_scal = 1;
+				_time = 0.4;
+				console.log("RIDE");
+			}
+
+			$.tween("bee_container", _time, {delay:_delay, x:_x, y:_y, scaleX:1, scaleY:1, rotation:_c_rota*Math.random(), ease:Sine.easeInOut, onComplete:beeFly});
 		}
 	    /*
 
@@ -317,7 +403,12 @@
 			{
 				icon: 'img/main_marker.png',
 	        	type: 'own',
-	        	text: "Vitu bácsi"
+	        	text: "HIVE"
+		    },
+		    {
+				icon: 'img/bee_marker.png',
+	        	type: 'own',
+	        	text: "Vitu's Bee"
 		    },
 		    {
 				icon: 'img/marker_0.png',
@@ -360,14 +451,76 @@
 	        	text: "Strawberry Cinema"
 		    }
 		];
+		var pickables = [
+			{
+				icon: 'img/coin_marker.png',
+				active: 'img/coin_active_marker.png',
+	        	type: 'own',
+	        	text: "1 Coin"
+		    },
+		    {
+				icon: 'img/coin_marker.png',
+				active: 'img/coin_active_marker.png',
+	        	type: 'own',
+	        	text: "1 Coin"
+		    },
+		    {
+				icon: 'img/coin_marker.png',
+				active: 'img/coin_active_marker.png',
+	        	type: 'own',
+	        	text: "1 Coin"
+		    }
+		    
+		   
+		];
+		function checkPickables(){
+			if(pickables[0].marker){
+				for(var i = 0; i < pickables.length; i++){
+					//markers[i].marker.setMap(null);
+					var dist = getDistance(bee_pos, pickables[i].marker.position);
+					
+					if(dist < 23){
+						if(!pickables[i].ready){
+							pickables[i].marker.setIcon(pickables[i].active);
+							pickables[i].ready = true;
+						}
+					}else if(pickables[i].ready){
+						pickables[i].marker.setIcon(pickables[i].icon);
+						pickables[i].ready = false;
+					}
+				}
+			}
+		}
+		var rad = function(x) {
+		  	return x * Math.PI / 180;
+		};
+
+		var getDistance = function(p1, p2) {
+		  	var R = 6378137; // Earth’s mean radius in meter
+		  	var dLat = rad(p2.lat() - p1.lat());
+		  	var dLong = rad(p2.lng() - p1.lng());
+		  	var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		    Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+		    Math.sin(dLong / 2) * Math.sin(dLong / 2);
+		  	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		  	var d = R * c;
+		  	return d; // returns the distance in meter
+		};
 		function centerMap(){
 			map_centered = true;
-			map.panTo(infowindow.position);
+			map.panTo(bee_pos.position);
 		}
 		function removeMarkers(){
 			for(var i = 0; i < markers.length; i++){
 				markers[i].marker.setMap(null);
 			}
+			for(var i = 0; i < pickables.length; i++){
+				pickables[i].marker.setMap(null);
+			}
+		}
+		function startRide(){
+			beeRide();
+			removeMarkers();
 		}
 		function showMarkers(){
 			createMarkers();
@@ -377,46 +530,77 @@
 
 			var radius = 0.003;
       		for (var i = 0; i < markers.length; i++){
-      			console.log(pos.lat()+" "+ pos.lng());
+      			//console.log(pos.lat()+" "+ pos.lng());
       			random_pos = new google.maps.LatLng(
       				pos.lat()-radius/2+Math.random()*radius,
       				pos.lng()-radius/2+Math.random()*radius
       			);
-      			markers[i].marker = new MarkerWithLabel({
-          			map: map,
-            		position: !i ? pos : random_pos,
-            		icon: markers[i].icon,
-            		animation:google.maps.Animation.DROP,
-            		draggable: true,
-       				raiseOnDrag: true,
-       				labelContent:markers[i].text,
-            		
-            		labelClass: "labels",
-            		labelAnchor: new google.maps.Point(150,-15)
-            	});
+      			if(!markers[i].marker){
+	      			markers[i].marker = new MarkerWithLabel({
+	          			map: map,
+	            		position: !i ? pos : random_pos,
+	            		icon: markers[i].icon,
+	            		animation:google.maps.Animation.DROP,
+	            		/*draggable: true,
+	       				raiseOnDrag: true,*/
+	       				labelContent:markers[i].text,
+	            		
+	            		labelClass: "labels",
+	            		labelAnchor: new google.maps.Point(150,-15)
+	            	});
+	      		}else{
+	      			markers[i].marker.setMap(map);
+	      		}
       		}
-      		cirle_small = new google.maps.Circle({
-	            strokeColor: '#00FF00',
-	            strokeOpacity: 0,
-	            strokeWeight: 1,
-	            fillColor: '#FF0000',
-	            fillOpacity: 0.2,
-	            map: map,
-	            center: infowindow.position,
-	            radius: 15
-	        });
-	        markers.push({marker:cirle_small});
-	        cirle_large = new google.maps.Circle({
-	            strokeColor: '#FF0000',
-	            strokeOpacity: 0,
-	            strokeWeight: 1,
-	            fillColor: '#FF0000',
-	            fillOpacity: 0.2,
-	            map: map,
-	            center: infowindow.position,
-	            radius: 24
-	        });
-	        markers.push({marker:cirle_large});
+      		for (var i = 0; i < pickables.length; i++){
+      			//console.log(pos.lat()+" "+ pos.lng());
+      			random_pos = new google.maps.LatLng(
+      				pos.lat()-radius/4+Math.random()*radius/2,
+      				pos.lng()-radius/4+Math.random()*radius/2
+      			);
+      			if(!pickables[i].marker){
+	      			pickables[i].marker = new MarkerWithLabel({
+	          			map: map,
+	            		position: random_pos,
+	            		icon: pickables[i].icon,
+	            		animation:google.maps.Animation.DROP,
+	       				labelContent:pickables[i].text,
+	            		
+	            		labelClass: "labels",
+	            		labelAnchor: new google.maps.Point(150,-15)
+	            	});
+	      		}else{
+	      			pickables[i].marker.setMap(map);
+	      		}
+      		}
+      		if(!circle_small){
+	      		circle_small = new google.maps.Circle({
+		            strokeColor: '#00FF00',
+		            strokeOpacity: 0,
+		            strokeWeight: 1,
+		            fillColor: '#FF0000',
+		            fillOpacity: 0,
+		            map: map,
+		            center: bee_pos.position,
+		            radius: 15
+		        });
+		        markers.push({marker:circle_small});
+		        circle_large = new google.maps.Circle({
+		            strokeColor: '#FF0000',
+		            strokeOpacity: 0,
+		            strokeWeight: 1,
+		            fillColor: '#FF0000',
+		            fillOpacity: 0.2,
+		            map: map,
+		            center: bee_pos.position,
+		            radius: 24
+		        });
+		        markers.push({marker:circle_large});
+		    }
+		    if(act_frame == "game" && markers[1].marker){
+		    	markers[1].marker.setMap(null);
+		    }
+		    
 		}
 	    function initializeMap() {
 	        var myOptions = {
@@ -433,10 +617,10 @@
 	          navigator.geolocation.getCurrentPosition(function(position) {
 	            pos = new google.maps.LatLng(position.coords.latitude,
 	                                             position.coords.longitude);
-	            infowindow = {position: pos};
+	            bee_pos = {position: pos};
 	            
 	      		
-	      		//startApp();
+	      		startApp();
 	      		//createMarkers();
 		        map.addListener('drag', function() {
 		        	map_centered = false;
@@ -464,7 +648,7 @@
 	          content: content
 	        };
 
-	        var infowindow = new google.maps.InfoWindow(options);
+	        var bee_pos = options.position;
 	        map.setCenter(options.position);
 	    }
 	};

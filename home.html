@@ -91,12 +91,12 @@
         }
         video {
             position:absolute;
-            min-width: 100%; 
+            /*min-width: 100%; 
             min-height: 100%; 
 
-              /* Setting width & height to auto prevents the browser from stretching or squishing the video */
+               Setting width & height to auto prevents the browser from stretching or squishing the video 
             position: absolute;
-            object-fit: cover;
+            object-fit: cover;*/
         }
     </style>
     
@@ -162,14 +162,21 @@
             <div id="get_game" class="button"></div>
         </div>
         <div id="game" class="slide">
-            
-            <img class="center disabled" src="img/game.png" />
-            <div id="go_game" class="button"></div>
+            <div id="game_container" class="center disabled">
+                <div id="bee_container">
+                    <img id="bee_body" src="img/bee_body.png" />
+                </div>
+            </div>
+        </div>
+        </div>
+        <div id="mapper" class="slide">
+            <img class="center disabled" src="" />
         </div>
         <div id="overlay">
             <img id="goto_profile" class="button" src="img/goto_profile.png">
             <img id="goto_hive" class="button" src="img/goto_hive.png">
-            <img id="goto_map" class="button" src="img/goto_map.png">
+            <img id="lets_mapper" class="button" src="img/lets_mapper.png">
+            <img id="lets_game" class="button" src="img/lets_game.png">
             <img id="goto_menu" class="button" src="img/goto_menu.png">
         </div>
         
