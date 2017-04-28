@@ -21,6 +21,7 @@
 		var video;
 		var overlay = false;
 		var white = true;
+		var panorama;
 		var overlay_positions = {
 			goto_menu:{
 				x:30,
@@ -62,6 +63,38 @@
 			
 		}();
 		function startVideo(fade){
+			if(map && !panorama){
+				map.getStreetView();
+				panorama = map.getStreetView();
+		          // Set up Street View and initially set it visible. Register the
+		          // custom panorama provider function.
+		          var panoOptions = {
+		            position: pos,
+		            disableDefaultUI: true,
+		            visible: true/*,
+		            panoProvider: getCustomPanorama*/
+		          };
+		          panorama.setOptions(panoOptions);
+		          var streetviewService = new google.maps.StreetViewService();
+		          var radius = 50;
+		          streetviewService.getPanoramaByLocation(pos, radius,
+	              function(result, status) {
+	                console.log("1", arguments);
+	            if (status == google.maps.StreetViewStatus.OK) {
+	              // We'll monitor the links_changed event to check if the current
+	              // pano is either a custom pano or our entry pano.
+	              google.maps.event.addListener(panorama, 'links_changed', function() {
+	                  console.log("2", arguments);
+	                  //createCustomLinks(result.location.pano);
+	              });
+	              google.maps.event.addListener(panorama, 'position_changed', function() {
+	                console.log('panorama.getPosition()', panorama.getPosition());
+	              });
+	              google.maps.event.addListener(panorama, 'pov_changed', function() {
+	              });
+	            }
+	          });
+			}
 			/*var constraints = { audio: false, video: { width: 1280, height: 720 } };
 			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(mediaStream) {
@@ -233,6 +266,7 @@
 			$.tween(prev_frame, tween_time, {autoAlpha:0, ease:ease});
 			switch(act_frame){
 				case "game":
+					showMarkers();
 					need_overlay = true;
 					need_white = false;
 					startVideo(true);
@@ -355,7 +389,7 @@
        				labelContent:markers[i].text,
             		
             		labelClass: "labels",
-            		labelAnchor: new google.maps.Point(150,-15),
+            		labelAnchor: new google.maps.Point(150,-15)
             	});
       		}
       		cirle_small = new google.maps.Circle({
