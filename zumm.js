@@ -70,8 +70,11 @@
 		          // custom panorama provider function.
 		          var panoOptions = {
 		            position: pos,
-		            disableDefaultUI: true,
-		            visible: true/*,
+		            //disableDefaultUI: true,
+		            visible: true,
+		            motionTracking: true,
+      				motionTrackingControl: true
+		            /*,
 		            panoProvider: getCustomPanorama*/
 		          };
 		          panorama.setOptions(panoOptions);
