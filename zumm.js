@@ -36,7 +36,7 @@
 				y:30,
 				pos:"top_right"
 			},
-			goto_hive:{
+			move:{
 				x:200,
 				y:200,
 				pos:"bottom_right"
@@ -52,6 +52,7 @@
 				pos:"bottom_left"
 			},
 		}
+		var pano;
 		init = function() {
 			video = document.getElementById('video');
 			TweenPlugin.activate([CSSPlugin]);
@@ -83,11 +84,34 @@
 			   		startRide();
 			   }
 			});
+			body.addEventListener("keydown", function(evt){
+			    var keyCode = (evt.which?evt.which:(evt.keyCode?evt.keyCode:0))
+			    //alert(keyCode);
+			    console.log("keypress "+keyCode);
+			});
 		}();
+		function difference(link) {
+			return Math.abs(pano.pov.heading%360 - link.heading);
+		}
+		function Move(){
+			startRide();
+			  var curr;
+			  for(i=0; i < pano.links.length; i++) {
+			    var differ = difference(pano.links[i]);
+			    if(curr == undefined) {
+			      curr = pano.links[i];
+			    }
+
+			    if(difference(curr) > difference(pano.links[i])) {
+			      curr = curr = pano.links[i];
+			    }
+			  }
+			  pano.setPano(curr.pano);
+		}
 		function startPanorama(fade){
 			if(map && !panorama){
 				map.getStreetView();
-				panorama = map.getStreetView();
+				pano = panorama = map.getStreetView();
 		          // Set up Street View and initially set it visible. Register the
 		          // custom panorama provider function.
 		          var panoOptions = {
@@ -242,8 +266,13 @@
 					newFrame(name_arr[1]);
 				break;
 			}*/
-			var name_arr = e.target.id.split("_");
-			newFrame(name_arr[1]);
+			if(e.target.id == "move"){
+				Move();
+				console.log("move");
+			}else{
+				var name_arr = e.target.id.split("_");
+				newFrame(name_arr[1]);
+			}
 		}
 		function switchView(frame){
 			if(frame == "mapper"){
