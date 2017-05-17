@@ -12,7 +12,7 @@
 		var pos;
 		var act_frame = "loading";
 		var prev_frame = "loading";
-		var frames = ["enter", "reg", "regcomp1", "regcomp2", "camp1", "camp2", "camp3", "mapper", "game", "hive"];
+		var frames = ["enter", "reg", "regcomp1", "regcomp2", "camp1", "camp2", "camp3", "mapper", "game", "hive", "menu", "profile", "code", "statistics", "settings", "avatar", "clan", "chat", "search", "market", "sell", "change", "gift", "ar0", "ar1", "ar2", "ar3", "ar4"];
 		var slide_base_scale = {width:752, height:1336};
 		var cover_alpha_targ = 0.6;
 		var tween_time = 0.6;
@@ -24,7 +24,9 @@
 		var panorama;
 		var panorama_changed = false;
 		var game_view = "game";//map
-
+		var menu_type = "none";
+		var bg = false;
+		var table = false;
 		var overlay_positions = {
 			goto_menu:{
 				x:30,
@@ -36,10 +38,15 @@
 				y:30,
 				pos:"top_right"
 			},
-			move:{
+			goto_hive:{
 				x:200,
 				y:200,
 				pos:"bottom_right"
+			},
+			move:{
+				x:200,
+				y:200,
+				pos:"bottom_center"
 			},
 			lets_mapper:{
 				x:30,
@@ -53,6 +60,7 @@
 			},
 		}
 		var pano;
+		var buttons;
 		init = function() {
 			video = document.getElementById('video');
 			TweenPlugin.activate([CSSPlugin]);
@@ -65,8 +73,7 @@
 			body.onresize = resize;
 			resize();
 			initializeMap();
-			main = $.id("main");
-			main.style.display = "block";
+			
 			body.addEventListener("mousedown", function(event) {
 				if(event.target.classList.contains("widget-scene-canvas")){
 					console.log("hit_map");
@@ -89,6 +96,8 @@
 			    //alert(keyCode);
 			    console.log("keypress "+keyCode);
 			});
+			main = $.id("main");
+			main.style.display = "block";
 		}();
 		function difference(link) {
 			return Math.abs(pano.pov.heading%360 - link.heading);
@@ -101,7 +110,6 @@
 			    if(curr == undefined) {
 			      curr = pano.links[i];
 			    }
-
 			    if(difference(curr) > difference(pano.links[i])) {
 			      curr = curr = pano.links[i];
 			    }
@@ -155,6 +163,8 @@
 			//$.tween("video", tween_time, {autoAlpha:0, ease:ease, onComplete:function(){/*video.stop();*/}});	
 		}
 		function reset() {
+			$.set("bg", {autoAlpha:0});
+			$.set("table", {autoAlpha:0});
 			$.set("map", {webkitFilter:"blur(5px)"});
 			$.set("overlay", {autoAlpha:0});
 			$.set("video", {autoAlpha:0});
@@ -163,15 +173,27 @@
 			$.set("gif", {x:-400/2+loading_pos.x, y:160});
 			$.set("enter_name", {x:114, y:509});
 			$.set("enter_pass", {x:114, y:588});
+			$.set("reg_game", {x:298, y:1125, width:166, height:166});
 			$.set("goto_reg", {x:114, y:598, width:518, height:70});
 			$.set("goto_regcomp1", {x:114, y:674, width:518, height:70});
 			$.set("goto_game", {x:293, y:784, width:166, height:166});
-			$.set("goto_regcomp2", {x:524, y:1164, width:166, height:166});
-			$.set("goto_camp1", {x:524, y:1164, width:166, height:166});
-			$.set("goto_camp2", {x:524, y:1164, width:166, height:166});
-			$.set("goto_camp3", {x:524, y:1164, width:166, height:166});
-			$.set("go_game", {x:524, y:1164, width:166, height:166});
-			$.set("get_game", {x:368, y:1092, width:166, height:166});
+			$.set("goto_regcomp2", {x:298, y:1165, width:166, height:166});
+			$.set("goto_camp1", {x:298, y:1165, width:166, height:166});
+			$.set("goto_camp2", {x:298, y:1165, width:166, height:166});
+			$.set("goto_camp3", {x:298, y:1165, width:166, height:166});
+			$.set("go_game", {x:298, y:1165, width:166, height:166});
+			
+			$.set("menu_reg", {x:0, y:332, width:478, height:80});
+			$.set("menu_regcomp1", {x:0, y:255, width:478, height:80});
+			$.set("menu_game", {x:0, y:0, width:751, height:1334});
+			$.set("hive_game", {x:0, y:0, width:751, height:1334});
+			$.set("hive_market", {x:291, y:1092, width:166, height:166});
+
+			$.set("profileMenu", {autoAlpha:0});
+			$.set("profile_code", {x:147, y:79, width:200, height:200});
+			$.set("profile_statistics", {x:36, y:283, width:200, height:200});
+			$.set("profile_clan", {x:406, y:81, width:200, height:200});
+			$.set("profile_settings", {x:521, y:282, width:200, height:200});
 
 			startPanorama(false);
 
@@ -180,7 +202,7 @@
 				$.set(frames[i], {autoAlpha:0});
 			}
 			
-			var buttons = document.getElementsByClassName("button");
+			buttons = document.getElementsByClassName("button");
 			for(var i = 0; i < buttons.length; i++)
 			{
 				buttons[i].addEventListener("click", buttonClicked);
@@ -189,7 +211,11 @@
 
 		};
 		function resize() {
-			var W = map_width_offset + Math.max( body.scrollWidth, body.offsetWidth, 
+			//$.delay(0.2, resizeHelper);
+			resizeHelper();
+		};
+		function resizeHelper(){
+			var W = Math.max( body.scrollWidth, body.offsetWidth, 
 			                       html.clientWidth, html.scrollWidth, html.offsetWidth );
 
 
@@ -204,6 +230,9 @@
 			video.height = H;
 			var scal = H/slide_base_scale.height;
 
+			$.set("bg", {x:W/2-3000*scal/2, y:0, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
+
+			$.set("table", {x:W/2-1337*scal/2, y:0, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
 
 			var slides = document.getElementsByClassName("slide");
 			for(var i = 0; i < slides.length; i++)
@@ -211,18 +240,33 @@
 				$.set(slides[i], {scaleX:scal, scaleY:scal});
 			}
 
+			var _x;
+			var _y;
 
 			var center = document.getElementsByClassName("center");
 			for(var i = 0; i < center.length; i++)
 			{
-				var _x = (W*(1/scal)/2-slide_base_scale.width/2);
+				_x = (W*(1/scal)/2-slide_base_scale.width/2);
+				//_x = W*scal/2-slide_base_scale.width*scal/2;
 				$.set(center[i], {x:_x});
+				
 			}
-			var _x;
-			var _y;
+			var left = document.getElementsByClassName("left");
+			for(var i = 0; i < left.length; i++)
+			{
+				$.set(left[i], {x:0});
+			}
+			var back = document.getElementsByClassName("back");
+			for(var i = 0; i < back.length; i++)
+			{
+				$.set(back[i], {x:196, y:1240, width:365, height:75});
+			}
+
+			console.log(W+", "+_x+", "+scal);
+			
+			_x = 0;
 
 			for(var butt in overlay_positions){
-				console.log(butt+" "+overlay_positions[butt])
 				switch (overlay_positions[butt].pos){
 					case "top_left":
 						_x = overlay_positions[butt].x*scal;
@@ -240,13 +284,17 @@
 						_x = overlay_positions[butt].x*scal;
 						_y = H-overlay_positions[butt].y*scal;
 					break;
+					case "bottom_center":
+						_x = W/2-overlay_positions[butt].x/2*scal;
+						_y = H-overlay_positions[butt].y*scal;
+					break;
 				}
 				$.set(butt, {x:_x, y:_y, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
 			}
 			if(bee_pos){
 				centerMap(bee_pos);
 			}
-		};
+		}
 		function startApp(){
 			
 			newFrame("enter");
@@ -269,6 +317,8 @@
 			if(e.target.id == "move"){
 				Move();
 				console.log("move");
+			}else if(e.target.classList.contains("back")){
+				newFrame("game");
 			}else{
 				var name_arr = e.target.id.split("_");
 				newFrame(name_arr[1]);
@@ -294,6 +344,10 @@
 			act_frame = act;
 			var need_overlay = false;
 			var need_white = false;
+			var need_type = "none";//profileMenu, marketMenu;
+			var need_bg = false;
+			var need_table = false;
+
 			switch(prev_frame){
 				case "loading":
 					$.tween("cover", 1, {delay:tween_time/2, autoAlpha:cover_alpha_targ, ease:ease});
@@ -302,13 +356,13 @@
 				case "game":
 					stopBeeAnim();
 				break;
+
 				default:
 					need_white = true;
-
 				break;
 			}
 
-			$.tween(prev_frame, tween_time, {autoAlpha:0, ease:ease});
+			
 			switch(act_frame){
 				case "game":
 					$.delay(0.4, showMarkers);
@@ -325,17 +379,40 @@
 					stopPanorama();
 					switchView(act_frame);
 				break;
+				case  "code":
+				case  "statistics":
+				case  "settings":
+				case  "profile":
+				case  "clan":
+					need_type = "profileMenu";
+					need_bg = true;
+				break;
+				case  "ar0":
+				case  "ar1":
+				case  "ar2":
+				case  "ar3":
+				case  "ar4":
+					need_table = true;
+				break;
 				default:
 					need_white = true;
 				break;
 			}
 			//$.tween("loading", 0.5, {autoAlpha:0});
-			
-			$.tween(act_frame, tween_time, {delay:tween_time*0.7, autoAlpha:1, ease:ease});
+			var _tween_time = tween_time;
+			if(need_type != "none" && menu_type == need_type){
+				console.log("INSTANT");
+				_tween_time	= 0.3;
+			}
+
+			$.tween(prev_frame, _tween_time, {autoAlpha:0, ease:ease});
+			$.tween(act_frame, _tween_time, {delay:_tween_time*0.7, autoAlpha:1, ease:ease});
 			
 			if(overlay && !need_overlay){
 				overlay = false;
-				$.tween("overlay", tween_time, {autoAlpha:0, ease:ease});
+				if(act_frame != "menu"){
+					$.tween("overlay", tween_time, {autoAlpha:0, ease:ease});
+				}
 			}
 			if(!overlay && need_overlay){
 				overlay = true;
@@ -350,6 +427,36 @@
 				white = true;
 				$.tween("cover", tween_time, {autoAlpha:cover_alpha_targ, ease:ease});
 				$.set("map", {webkitFilter:"blur(5px)"});
+			}
+			if(white && prev_frame == "menu"){
+				$.tween("overlay", tween_time, {autoAlpha:0, ease:ease});
+			}
+			if(bg && !need_bg){
+				bg = false;
+				$.tween("bg", tween_time, {autoAlpha:0, ease:ease});
+			}
+			if(!bg && need_bg){
+				bg = true;
+				$.tween("bg", tween_time, {autoAlpha:1, ease:ease});
+			}
+			if(table && !need_table){
+				table = false;
+				$.tween("table", tween_time, {autoAlpha:0, ease:ease});
+			}
+			if(!table && need_table){
+				table = true;
+				$.tween("table", tween_time, {autoAlpha:1, ease:ease});
+			}
+			if(menu_type != "none" && need_type == "none" ){
+				
+				console.log("SHOULD OUT");
+				$.tween(menu_type, tween_time, {autoAlpha:0, ease:ease});
+				menu_type = "none";
+			}
+			if(menu_type == "none" && need_type != "none" ){
+				menu_type = need_type;
+				console.log("SHOULD IN");
+				$.tween(menu_type, tween_time, {autoAlpha:1, ease:ease});
 			}
 		}
 

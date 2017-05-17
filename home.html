@@ -87,6 +87,7 @@
         .button {
             /*background: red;
             opacity: 0.3;*/
+            background-color:rgba(255, 0, 0, 0.06);
             cursor: pointer;
         }
         video {
@@ -120,6 +121,8 @@
         <div id="map"></div>
         <div id="video"></div>
         <div id="cover" class="disabled"></div>
+        <img id="bg" src="img/bg.jpg"/>
+        <img id="table" src="img/table.jpg"/>
         <div id="loading">
             <img id="gif" src="img/loading.gif"/>
             <img id="logo" src="img/logo.png"/>
@@ -135,31 +138,47 @@
             </div>
         </div>
         <div id="reg" class="slide">
-            <img class="center" src="img/reg.png" />
+            <div class="center">
+                <img src="img/reg.png" />
+                <div id="reg_game" class="button"></div>
+            </div>
         </div>
         <div id="regcomp1" class="slide">
-            <img class="center" src="img/reg_comp_1.png" />
-            <div id="goto_regcomp2" class="button"></div>
+            <div class="center">
+                <img src="img/reg_comp_1.png" />
+                <div id="goto_regcomp2" class="button"></div>
+            </div>
         </div>
         <div id="regcomp2" class="slide">
-            <img class="center" src="img/reg_comp_2.png" />
-            <div id="goto_camp1" class="button"></div>
+            <div class="center">
+                <img src="img/reg_comp_2.png" />
+                <div id="goto_camp1" class="button"></div>
+            </div>
         </div>
         <div id="camp1" class="slide">
-            <img class="center" src="img/camp1.png" />
-            <div id="goto_camp2" class="button"></div>
+            <div class="center">
+                <img src="img/camp1.png" />
+                <div id="goto_camp2" class="button"></div>
+            </div>
         </div>
         <div id="camp2" class="slide">
-            <img class="center" src="img/camp2.png" />
-            <div id="goto_camp3" class="button"></div>
+            <div class="center">
+                <img src="img/camp2.png" />
+                <div id="goto_camp3" class="button"></div>
+            </div>
         </div>
         <div id="camp3" class="slide">
-            <img class="center" src="img/camp3.png" />
-            <div id="go_game" class="button"></div>
+            <div class="center">
+                <img src="img/camp3.png" />
+                <div id="go_game" class="button"></div>
+            </div>
         </div>
         <div id="hive" class="slide">
-            <img class="center" src="img/hive.png" />
-            <div id="get_game" class="button"></div>
+            <div class="center">
+                <img src="img/hive.png" />
+                <div id="hive_game" class="button"></div>
+                <div id="hive_market" class="button"></div>
+            </div>
         </div>
         <div id="game" class="slide">
             <div id="game_container" class="center disabled">
@@ -168,12 +187,136 @@
                 </div>
             </div>
         </div>
+        <div id="profile" class="slide">
+            <div class="center">
+                <img src="img/profile.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="code" class="slide">
+            <div class="center">
+                <img src="img/code.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="statistics" class="slide">
+            <div class="center">
+                <img src="img/statistics.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="settings" class="slide">
+            <div class="center">
+                <img src="img/settings.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="avatar" class="slide">
+            <div class="center">
+                <img src="img/avatar.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="clan" class="slide">
+            <div class="center">
+                <img src="img/clan.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="chat" class="slide">
+            <div class="center">
+                <img src="img/chat.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="search" class="slide">
+            <div class="center">
+                <img src="img/search.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="market" class="slide">
+            <div class="center">
+                <img src="img/market.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="sell" class="slide">
+            <div class="center">
+                <img src="img/sell.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="change" class="slide">
+            <div class="center">
+                <img src="img/change.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="gift" class="slide">
+            <div class="center">
+                <img src="img/gift.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="ar0" class="slide">
+            <div class="center">
+                <img src="img/ar0.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="ar1" class="slide">
+            <div class="center">
+                <img src="img/ar1.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="ar2" class="slide">
+            <div class="center">
+                <img src="img/ar2.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="ar3" class="slide">
+            <div class="center">
+                <img src="img/ar3.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+        <div id="ar4" class="slide">
+            <div class="center">
+                <img src="img/ar4.png" />
+                <div class="back button"></div>
+            </div>
+        </div>
+
+
+
+
+
+        <div id="menu" class="slide">
+            <div class="left">
+                <img src="img/menu.png" />
+                <div id="menu_game" class="button"></div>
+                <div id="menu_reg" class="button"></div>
+                <div id="menu_regcomp1" class="button"></div>
+            </div>
+        </div>
+        <div id="profileMenu" class="slide">
+            <div class="center">
+                <div id="profile_code" class="button"></div>
+                <div id="profile_statistics" class="button"></div>
+                <div id="profile_clan" class="button"></div>
+                <div id="profile_settings" class="button"></div>
+            </div>
+        </div>
         </div>
         <div id="mapper" class="slide">
-            <img class="center disabled" src="" />
+            <img class="center disabled" src=""/>
         </div>
         <div id="overlay">
             <img id="goto_profile" class="button" src="img/goto_profile.png">
+            <img id="goto_hive" class="button" src="img/goto_hive.png">
             <img id="move" class="button" src="img/arrow.png">
             <img id="lets_mapper" class="button" src="img/lets_mapper.png">
             <img id="lets_game" class="button" src="img/lets_game.png">
