@@ -27,6 +27,7 @@
 		var menu_type = "none";
 		var bg = false;
 		var table = false;
+		var submenu = false;
 		var overlay_positions = {
 			goto_menu:{
 				x:30,
@@ -190,10 +191,22 @@
 			$.set("hive_market", {x:291, y:1092, width:166, height:166});
 
 			$.set("profileMenu", {autoAlpha:0});
-			$.set("profile_code", {x:147, y:79, width:200, height:200});
 			$.set("profile_statistics", {x:36, y:283, width:200, height:200});
+			$.set("profile_code", {x:147, y:79, width:200, height:200});
 			$.set("profile_clan", {x:406, y:81, width:200, height:200});
 			$.set("profile_settings", {x:521, y:282, width:200, height:200});
+
+
+			$.set("marketMenu", {autoAlpha:0});
+			$.set("market_change", {x:36, y:283, width:200, height:200});
+			$.set("market_market", {x:147, y:79, width:200, height:200});
+			$.set("market_sell", {x:406, y:81, width:200, height:200});
+			$.set("market_gift", {x:521, y:282, width:200, height:200});
+
+			$.set("subMenu", {autoAlpha:0});
+			$.set("submenu_chat", {x:59, y:602, width:210, height:74});
+			$.set("submenu_search", {x:272, y:602, width:210, height:74});
+			$.set("submenu_clan", {x:485, y:602, width:210, height:74});
 
 			startPanorama(false);
 
@@ -230,6 +243,10 @@
 			video.height = H;
 			var scal = H/slide_base_scale.height;
 
+			$.set("profileMenu", {scaleX:scal, scaleY:scal});
+			$.set("marketMenu", {scaleX:scal, scaleY:scal});
+			$.set("subMenu", {scaleX:scal, scaleY:scal});
+			
 			$.set("bg", {x:W/2-3000*scal/2, y:0, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
 
 			$.set("table", {x:W/2-1337*scal/2, y:0, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
@@ -347,7 +364,7 @@
 			var need_type = "none";//profileMenu, marketMenu;
 			var need_bg = false;
 			var need_table = false;
-
+			var need_submenu = false;
 			switch(prev_frame){
 				case "loading":
 					$.tween("cover", 1, {delay:tween_time/2, autoAlpha:cover_alpha_targ, ease:ease});
@@ -379,14 +396,25 @@
 					stopPanorama();
 					switchView(act_frame);
 				break;
+				case  "search":
+				case  "clan":
+				case  "chat":
+					need_submenu = true;
 				case  "code":
 				case  "statistics":
 				case  "settings":
 				case  "profile":
-				case  "clan":
 					need_type = "profileMenu";
 					need_bg = true;
 				break;
+				case "change":
+				case  "market":
+				case  "sell":
+				case  "gift":
+					need_type = "marketMenu";
+					need_bg = true;
+				break;
+
 				case  "ar0":
 				case  "ar1":
 				case  "ar2":
@@ -457,6 +485,14 @@
 				menu_type = need_type;
 				console.log("SHOULD IN");
 				$.tween(menu_type, tween_time, {autoAlpha:1, ease:ease});
+			}
+			if(submenu && !need_submenu){
+				submenu = false;
+				$.tween("subMenu", tween_time, {autoAlpha:0, ease:ease});
+			}
+			if(!submenu && need_submenu){
+				submenu = true;
+				$.tween("subMenu", tween_time, {autoAlpha:1, ease:ease});
 			}
 		}
 
