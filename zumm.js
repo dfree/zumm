@@ -34,7 +34,7 @@
 				y:30,
 				pos:"top_left"
 			},
-			goto_profile:{
+			goto_statistics:{
 				x:200,
 				y:30,
 				pos:"top_right"
@@ -189,15 +189,18 @@
 			$.set("menu_game", {x:0, y:0, width:751, height:1334});
 			$.set("hive_game", {x:0, y:0, width:751, height:1334});
 			$.set("hive_market", {x:291, y:1092, width:166, height:166});
+			$.set("hive_ar0", {x:12, y:389, width:727, height:499});
 
-			$.set("profileMenu", {autoAlpha:0});
+			$.set("profileMenu", {y:-12, autoAlpha:0});
 			$.set("profile_statistics", {x:36, y:283, width:200, height:200});
 			$.set("profile_code", {x:147, y:79, width:200, height:200});
 			$.set("profile_clan", {x:406, y:81, width:200, height:200});
 			$.set("profile_settings", {x:521, y:282, width:200, height:200});
 
+			$.set("goto_avatar", {x:203, y:655, width:347, height:90});
 
-			$.set("marketMenu", {autoAlpha:0});
+
+			$.set("marketMenu", {y:-12, autoAlpha:0});
 			$.set("market_change", {x:36, y:283, width:200, height:200});
 			$.set("market_market", {x:147, y:79, width:200, height:200});
 			$.set("market_sell", {x:406, y:81, width:200, height:200});
@@ -249,7 +252,7 @@
 			
 			$.set("bg", {x:W/2-3000*scal/2, y:0, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
 
-			$.set("table", {x:W/2-1337*scal/2, y:0, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
+			$.set("table", {x:W/2-2375*scal/2, y:0, scaleX:scal, scaleY:scal, transformOrigin:"0 0"});
 
 			var slides = document.getElementsByClassName("slide");
 			for(var i = 0; i < slides.length; i++)
@@ -277,6 +280,12 @@
 			for(var i = 0; i < back.length; i++)
 			{
 				$.set(back[i], {x:196, y:1240, width:365, height:75});
+			}
+
+			var ar = document.getElementsByClassName("ar");
+			for(var i = 0; i < ar.length; i++)
+			{
+				$.set(ar[i], {x:0, y:0, width:slide_base_scale.width, height:slide_base_scale.height});
 			}
 
 			console.log(W+", "+_x+", "+scal);
@@ -403,6 +412,7 @@
 				case  "code":
 				case  "statistics":
 				case  "settings":
+				case  "avatar":
 				case  "profile":
 					need_type = "profileMenu";
 					need_bg = true;
